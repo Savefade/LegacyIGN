@@ -1,0 +1,106 @@
+<?php
+include "configuration.php";
+$signeddatafromthegram = isset($_POST['signed_body']) ? $_POST['signed_body'] : null;
+$sentjson = substr($signeddatafromthegram, 65);
+$decodedjson = json_decode($sentjson, false);
+$password = $decodedjson->password;
+$username = $decodedjson->username;
+$deviceID = $decodedjson->device_id;
+$getdbdata = new mysqli($mysqlurl, $mysqlusername, $mysqlpassword, $mysqldbname);
+$query = $getdbdata->prepare('SELECT ID, username, Password, uniquetoken, device_id, isaccountprivate, isverified FROM accounts WHERE username = ? LIMIT 1');
+$query->bind_param('s', $username);
+$query->execute();
+$data = $query->get_result();
+$query->close();
+if($data->num_rows === 1){
+    $fetchstuff = $data->fetch_assoc();
+    $ID = $fetchstuff["ID"];
+    $PasswordDB = $fetchstuff["Password"];
+    $username = $fetchstuff["username"];
+    $uniquetoken = $fetchstuff["uniquetoken"];
+    $device_id = $fetchstuff["device_id"];
+    $isverified = $fetchstuff["isverified"];
+    $isaccountprivate = $fetchstuff["isaccountprivate"];
+    $saltedpasswordlol = $uniquetoken . $password . $uniquetoken;
+    $isprivate = false;
+    $verified = false;
+    if($isverified == 1){
+        $verified = true;
+    }
+    if($isaccountprivate == 1){
+        $isprivate = true;
+    }
+    if(password_verify($saltedpasswordlol, $PasswordDB)){
+        $response = array (
+            'logged_in_user' => 
+            array (
+              'pk' => $ID,
+              'username' => $username,
+              'is_verified' => $verified, //to be added
+              'profile_pic_id' => $ID,
+              'profile_pic_url' => $baseurl . "/ign/icon.png" ,
+              'is_private' => $isprivate,
+              'pk_id' => $ID,
+              'full_name' => $username,
+              'account_badges' => 
+              array (
+              ),
+              'has_anonymous_profile_picture' => false,
+              'is_supervision_features_enabled' => false,
+              'all_media_count' => 0,
+              'liked_clips_count' => 0,
+              'fbid_v2' => $ID,
+              'interop_messaging_user_fbid' => 0,
+              'is_using_unified_inbox_for_direct' => false,
+              'biz_user_inbox_state' => 0,
+              'show_insights_terms' => false,
+              'nametag' => 
+              array (
+                'mode' => 0,
+                'gradient' => '2',
+                'emoji' => '😀',
+                'selfie_sticker' => '0',
+              ),
+              'allowed_commenter_type' => 'any',
+              'has_placed_orders' => false,
+              'reel_auto_archive' => 'on',
+              'total_igtv_videos' => 0,
+              'can_boost_post' => false,
+              'can_see_organic_insights' => false,
+              'wa_addressable' => false,
+              'wa_eligibility' => 0,
+              'is_business' => false, //to be added
+              'professional_conversion_suggested_account_type' => 2,
+              'account_type' => 1,
+              'is_category_tappable' => false,
+              'is_call_to_action_enabled' => NULL,
+              'allow_contacts_sync' => false,
+              'phone_number' => '', //to be added
+            ),
+            'session_flush_nonce' => NULL,
+            'token' => 'null', //to ne added
+            'auth_token' => 'null',
+            'status' => 'ok',
+        );
+            echo(json_encode($response));
+    }
+    else{
+        $response = array(
+            'message' => "Incorrect username or password!",
+            'status' => "fail",
+            'error_type' => "error"
+        );
+        echo(json_encode($response));
+        exit;
+    }
+
+}
+else{
+    $response = array(
+        'message' => "Incorrect username or password!",
+        'status' => "fail",
+        'error_type' => "error"
+    );
+    echo(json_encode($response));
+    exit;
+}
