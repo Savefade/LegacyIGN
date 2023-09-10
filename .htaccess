@@ -1,0 +1,7 @@
+RewriteEngine On
+RewriteRule ^api/v1/feed/popular/$ ign/popular.php [L]
+RewriteRule ^api/v1/feed/timeline/$ ign/timeline.php [L]
+RewriteRule ^api/v1/direct_share/inbox/$ ign/messages.php [L]
+RewriteRule ^api/v1/accounts/create/$ ign/register.php [L]
+RewriteRule ^api/v1/accounts/login/$ ign/login.php [L]
+RewriteRule ^api/v1/media/upload/$ ign/upload.php [L]
