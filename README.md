@@ -21,3 +21,4 @@ Slow downs on all versions (when viewing too much photos) <br />
 crashes when viewing a picture in version 6+ (due to missing information) <br />
 wierd bihaviour when uploading (a different username might appear on the device that has uploaded the picture) <br />
 failed upload <br />
+1.87 signed up failed (1.87 doesn't sent signed_body) <br />
