@@ -1,11 +1,18 @@
 <?php
 include "configuration.php";
 $signeddatafromthegram = isset($_POST['signed_body']) ? $_POST['signed_body'] : null;
-$sentjson = substr($signeddatafromthegram, 65);
+if($signeddatafromthegram != null){
+$sentjson = substr($signeddatafromthegram, 65); // 
 $decodedjson = json_decode($sentjson, false);
 $password = $decodedjson->password;
 $username = $decodedjson->username;
 $deviceID = $decodedjson->device_id;
+}
+
+if($signeddatafromthegram == null){
+$username = isset($_POST['username']) ? $_POST['username'] : null;
+$password = isset($_POST['password']) ? $_POST['password'] : null;
+}
 $getdbdata = new mysqli($mysqlurl, $mysqlusername, $mysqlpassword, $mysqldbname);
 $query = $getdbdata->prepare('SELECT ID, username, Password, uniquetoken, device_id, isaccountprivate, isverified FROM accounts WHERE username = ? LIMIT 1');
 $query->bind_param('s', $username);
@@ -31,7 +38,7 @@ if($data->num_rows === 1){
         $isprivate = true;
     }
     if(password_verify($saltedpasswordlol, $PasswordDB)){
-        $response = array (
+        die(json_encode(array(
             'logged_in_user' => 
             array (
               'pk' => $ID,
@@ -42,28 +49,28 @@ if($data->num_rows === 1){
               'is_private' => $isprivate,
               'pk_id' => $ID,
               'full_name' => $username,
-              'account_badges' => 
+              'account_badges' => //unknown
               array (
               ),
               'has_anonymous_profile_picture' => false,
               'is_supervision_features_enabled' => false,
               'all_media_count' => 0,
               'liked_clips_count' => 0,
-              'fbid_v2' => $ID,
+              'fbid_v2' => $ID, //facebook bs
               'interop_messaging_user_fbid' => 0,
               'is_using_unified_inbox_for_direct' => false,
               'biz_user_inbox_state' => 0,
               'show_insights_terms' => false,
-              'nametag' => 
+              'nametag' => //unknown
               array (
                 'mode' => 0,
                 'gradient' => '2',
-                'emoji' => '😀',
+                'emoji' => '😀', 
                 'selfie_sticker' => '0',
               ),
               'allowed_commenter_type' => 'any',
               'has_placed_orders' => false,
-              'reel_auto_archive' => 'on',
+              'reel_auto_archive' => 'on', //not needed
               'total_igtv_videos' => 0,
               'can_boost_post' => false,
               'can_see_organic_insights' => false,
@@ -81,26 +88,21 @@ if($data->num_rows === 1){
             'token' => 'null', //to ne added
             'auth_token' => 'null',
             'status' => 'ok',
-        );
-            echo(json_encode($response));
+        )));
     }
     else{
-        $response = array(
+        die(json_encode(array(
             'message' => "Incorrect username or password!",
             'status' => "fail",
             'error_type' => "error"
-        );
-        echo(json_encode($response));
-        exit;
+        )));
     }
 
 }
 else{
-    $response = array(
+    die(json_encode(array(
         'message' => "Incorrect username or password!",
         'status' => "fail",
         'error_type' => "error"
-    );
-    echo(json_encode($response));
-    exit;
+    )));
 }

@@ -10,7 +10,7 @@ if ($getdbdata->connect_errno) {
 
     $gethighestuserid = mysqli_query($getdbdata, 'SELECT MAX(ID) AS max FROM `posts`;');
     $fetchstuff = mysqli_fetch_array($gethighestuserid);
-    $biggestpostid= $fetchstuff['max'];
+    $biggestpostid= $fetchstuff['max']; //replace with mario's suggestion
     $postid = $biggestpostid + 1;
     $PhotoURl = "/ign/photos/". $postid . ".png";
     $posttimestamp = time();
@@ -53,12 +53,12 @@ function runoriginaluploadscript($postid2){
     
         // Move the uploaded photo to the desired location
         if (move_uploaded_file($photoTmpPath, $filename)) {
-            echo 'Data saved successfully. ' . $postid2;
+            echo 'Success! :). ' . $postid2;
         } else {
-            echo 'Error saving data.';
+            echo 'Error : 1 :(';
         }
     } else {
-        echo 'Error saving data. Error: 2';
+        echo 'Error: 2. :(';
         exit;
     }
-} //generated upload script with php (will be dicommisioned soon)
+} // gpt generated upload script with php (will be dicommisioned soon) 

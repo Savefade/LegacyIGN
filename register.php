@@ -2,6 +2,7 @@
 include "configuration.php";
 if($isenabled == true){
 $signeddatafromthegram = isset($_POST['signed_body']) ? $_POST['signed_body'] : null;
+
 if(isset($_FILES['profile_pic'])){
     $response = array(
         'message' => "Currently profile pictures are not supported! Please restart the proccess!",
@@ -12,12 +13,20 @@ if(isset($_FILES['profile_pic'])){
     exit;
 }
 else{
+if($signeddatafromthegram != null){
 $sentjson = substr($signeddatafromthegram, 65);
 $decodedjson = json_decode($sentjson, false);
 $password = $decodedjson->password;
 $username = strtolower($decodedjson->username);
 $email = $decodedjson->email;
 $deviceID = $decodedjson->device_id;
+}
+else{
+$username = isset($_POST['username']) ? $_POST['username'] : null;
+$password = isset($_POST['password']) ? $_POST['password'] : null;
+$email = isset($_POST['email']) ? $_POST['email'] : null;
+$deviceID = isset($_POST['device_id']) ? $_POST['device_id'] : null;
+}
 //add 1 account per device check
 $getdbdata = new mysqli($mysqlurl, $mysqlusername, $mysqlpassword, $mysqldbname);
 $query = $getdbdata->prepare('SELECT ID, username, Password, uniquetoken, device_id, isaccountprivate, isverified FROM accounts WHERE username = ? LIMIT 1');
@@ -39,7 +48,7 @@ else{
     $isprivate = 0;
     $gethighestuserid = mysqli_query($getdbdata, 'SELECT MAX(ID) AS max FROM `accounts`;');
     $fetchstuff = mysqli_fetch_array($gethighestuserid);
-    $biggestuseridindb = $fetchstuff['max'];
+    $biggestuseridindb = $fetchstuff['max']; //replace with mario's suggestion
     $ID = $biggestuseridindb + 1;
     $hashedpassword = password_hash($token . $password . $token, PASSWORD_BCRYPT);
     $makeaccount = $getdbdata->prepare('INSERT INTO accounts (ID, username, Password, uniquetoken, device_id, isaccountprivate, isverified) VALUES (?, ?, ?, ?, ?, ?, ?)');

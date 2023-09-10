@@ -212,4 +212,4 @@ if ($isenabled == true) {
         );
 
         echo(json_encode($response));
-    }
+    } //speed improvement is requires!!!
