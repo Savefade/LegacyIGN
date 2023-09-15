@@ -1,5 +1,5 @@
 # LegacyIGN - A small server replacement for old Instagram versions
-Note: Database template for this version is not updated and the old one is unsupported! I will upload it tommorow
+Note: Database template for this version is not updated and the old one is unsupported! I will upload it tommorow <br />
 Creadits: i.instagram.com for the api responses, MarioPizza1 for suggestions on how to improve the project <br />
 This server supports versions from 1.87 to the latest version on iOS 7 (maybe later) <br />
 Supported features: <br />
