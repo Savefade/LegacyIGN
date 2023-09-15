@@ -1,12 +1,12 @@
 <?php
 include "configuration.php";
 
-if ($isenabled == true) {
+if ($isenabled) {
     $getdbdata = new mysqli($mysqlurl, $mysqlusername, $mysqlpassword, $mysqldbname);
 
     if ($getdbdata->connect_errno) {
         $response = array(
-            'message' => 'Failed to connect to MySQL: ' . $getdbdata->connect_error
+            'message' => 'Connection to the database failed! Reason: ' . $getdbdata->connect_error
         );
     } else {
         $gethighestpostid = mysqli_query($getdbdata, 'SELECT MAX(ID) AS max FROM `posts`;');
@@ -61,7 +61,7 @@ if ($isenabled == true) {
                 array (
                 ),
                 'comments' => 
-                array (
+                array ( 
                 ),
                 'comment_count' => 0,
                 'photo_of_you' => false,
@@ -211,5 +211,5 @@ if ($isenabled == true) {
             'status' => 'ok',
         );
 
-        echo(json_encode($response));
-    } //speed improvement is requires!!!
+        die(json_encode($response));
+    } //speed improvement is required!!!

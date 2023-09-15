@@ -1,6 +1,6 @@
 <?php
 include "configuration.php";
-if($isenabled == true){
+if($isenabled){
 $getdbdata = new mysqli($mysqlurl, $mysqlusername, $mysqlpassword, $mysqldbname);
 if ($getdbdata->connect_errno) {
     $response = array(

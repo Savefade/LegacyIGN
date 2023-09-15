@@ -1,7 +1,7 @@
 <?php
 include "configuration.php";
 
-if ($isenabled == true) {
+if ($isenabled) {
     $getdbdata = new mysqli($mysqlurl, $mysqlusername, $mysqlpassword, $mysqldbname);
 
     if ($getdbdata->connect_errno) {
@@ -13,8 +13,11 @@ if ($isenabled == true) {
         $fetchstuff = mysqli_fetch_array($gethighestpostid);
         $biggestpostidindb = $fetchstuff['max'];
         $fullarray = array();
-
-        for ($repeat = 1; $repeat < $biggestpostidindb; $repeat++) {
+        $repeat = 1;
+        if($biggestpostidindb > 30){
+          $repeat = $biggestpostidindb - 28; // added due to crashes on slower device like iPhone 2g and ipt1
+        }
+        for (;$repeat < $biggestpostidindb; $repeat++) {
             $query = $getdbdata->prepare('SELECT ID, username, AccountID, PhotoDIR, Likes, Comments, posttimestamp, description, views, isvideo, isuploadedbyprivateacc FROM posts WHERE ID = ? LIMIT 1');
             $query->bind_param("s", $repeat);
             $query->execute();
@@ -198,17 +201,6 @@ if ($isenabled == true) {
             'items' => $fullarray,
             'num_results' => 6,
             'more_available' => false,
-            'user' => array(
-                'pk' => $ID,
-                'username' => $username,
-                'is_verified' => false,
-                'profile_pic_id' => '2577010241112975910_47422889959',
-                'profile_pic_url' => 'http://192.168.2.202/ign/Icon.png',
-                'pk_id' => '47422889959',
-                'full_name' => $username,
-                'is_private' => false,
-                'profile_grid_display_type' => 'default',
-            ),
             'auto_load_more_enabled' => true,
             'status' => 'ok',
         );

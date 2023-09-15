@@ -1,5 +1,6 @@
 <?php
 include "configuration.php";
+if($isenabled){
 $signeddatafromthegram = isset($_POST['signed_body']) ? $_POST['signed_body'] : null;
 if($signeddatafromthegram != null){
 $sentjson = substr($signeddatafromthegram, 65); // 
@@ -105,4 +106,5 @@ else{
         'status' => "fail",
         'error_type' => "error"
     )));
+}
 }
