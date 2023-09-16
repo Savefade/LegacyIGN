@@ -17,7 +17,7 @@ inbox - 0% (only on 5+) <br />
 video uploading - 0% (no data is available, research required) <br />
 Direct messages 12% (only allows you to view an empty direct message page saying how to dm someone) Note: Not included <br />
 Known bugs: <br />
-doesn't keep you logged in after closing the app (a fix for version 6+ might be available) <br />
+doesn't keep you logged in after closing the app (this bug has been fixed in a new version that is coming out soon!) <br />
 Crashes on 3.0.1 when loading a couple of timeline objects <br />
 Slow downs on all versions (kinda fixed in popular) <br />
 crashes when viewing a picture in version 6+ (due to missing information) <br />
