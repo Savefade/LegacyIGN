@@ -5,7 +5,8 @@ iOS: 1.8.7 to the latest iOS 7 version <br />
 Windows Phone: 6tag (untested), Instagram Beta: Latest <br />
 Android: Untested, but in theory it should work (But that's just a theory)
 # How to setup
-To be written <br />
+You would need Fiddler Classic, a php compatible server, a mysql database <br />
+TBC
 
 # Credits
 I.instagram.com - API Responses <br />
