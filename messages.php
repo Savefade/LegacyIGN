@@ -11,10 +11,4 @@ $sessionid = $getsessiondata['sessionid'];
 if($_COOKIE['sessionid'] != $sessionid){
 exit;
 }
-$response = array(
-        'items' => array(),
-        'num_items' => 1,
-		'more_available' => false,
-        'status' => "ok"
-    );
-    die(json_encode($response));
+die(json_encode(array("status" => "ok")));

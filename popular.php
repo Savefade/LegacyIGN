@@ -13,13 +13,18 @@ if ($isenabled) {
         $fetchstuff = mysqli_fetch_array($gethighestpostid);
         $biggestpostidindb = $fetchstuff['max'];
         $fullarray = array();
-        $repeat = 1;
+        $repeat = 0;
         if($biggestpostidindb > 30){
           $repeat = $biggestpostidindb - 28; // added due to crashes on slower device like iPhone 2g and ipt1
         }
+        $ismoreavailable = false;
+        if(isset($_GET["profile"])){
+          $ismoreavailable = true;
+        }
         for (;$repeat < $biggestpostidindb; $repeat++) {
+          $postid = $repeat + 1;
             $query = $getdbdata->prepare('SELECT ID, username, AccountID, PhotoDIR, Likes, Comments, posttimestamp, description, views, isvideo, isuploadedbyprivateacc FROM posts WHERE ID = ? LIMIT 1');
-            $query->bind_param("s", $repeat);
+            $query->bind_param("s", $postid);
             $query->execute();
             $data = $query->get_result();
             $Islocked = 0;
@@ -36,6 +41,11 @@ if ($isenabled) {
 		$views = $row['views'];
         $isvideo = $row['isvideo'];
 		$isuploadedbyprivateacc = $row['isuploadedbyprivateacc'];
+    $pfpURL = "pfps/" . $username . ".png";
+    if(file_exists($pfpURL)){
+      $pfpURL = $baseurl . "/ign/pfps/" . $username . ".png";
+    }
+    else{$pfpURL = $baseurl . "/ign/Icon.png";}
         $itemsarraybro = array(
                 'taken_at' => $posttimestamp,
                 'pk' => $pk,
@@ -77,7 +87,7 @@ if ($isenabled) {
                   'username' => $username,
                   'is_verified' => false,
                   'profile_pic_id' => '2577010241112975910_47422889959',
-                  'profile_pic_url' => 'http://192.168.2.202/ign/Icon.png',
+                  'profile_pic_url' => $pfpURL,
                   'pk_id' => $pk,
                   'full_name' => $username,
                   'is_private' => false,
@@ -154,7 +164,7 @@ if ($isenabled) {
                     'username' => $username,
                     'is_verified' => false,
                     'profile_pic_id' => '2577010241112975910_47422889959',
-                    'profile_pic_url' => 'http://192.168.2.202/ign/Icon.png',
+                    'profile_pic_url' => $pfpURL,
                     'fbid_v2' => '17841447338787861',
                     'pk_id' => '47422889959',
                     'full_name' => $username,
@@ -199,8 +209,8 @@ if ($isenabled) {
 
         $response = array(
             'items' => $fullarray,
-            'num_results' => 6,
-            'more_available' => false,
+            'num_results' => $repeat,
+            'more_available' => $ismoreavailable,
             'auto_load_more_enabled' => true,
             'status' => 'ok',
         );

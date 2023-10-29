@@ -21,6 +21,8 @@ $query->execute();
 $data = $query->get_result();
 $query->close();
 if($data->num_rows === 1){
+
+    //todo save the cookie to the db with a hash
     $fetchstuff = $data->fetch_assoc();
     $ID = $fetchstuff["ID"];
     $PasswordDB = $fetchstuff["Password"];
@@ -39,6 +41,14 @@ if($data->num_rows === 1){
         $isprivate = true;
     }
     if(password_verify($saltedpasswordlol, $PasswordDB)){
+	$randomnumberforsessionid = rand();
+	$Sessionid = sha1($randomnumberforsessionid);
+    setcookie("sessionid", $Sessionid, time() + ($cookieexpiresin * 30), "/"); //setcookie
+    $setcookie = $getdbdata->prepare('UPDATE accounts SET sessionid = ? WHERE username = ? LIMIT 1');
+    $setcookie->bind_param('ss', $Sessionid, $username);
+    $setcookie->execute();
+    $setcookie->close();
+    setcookie("ds_user_id", $ID, time() + ($cookieexpiresin * 30), "/"); //setcookie
         die(json_encode(array(
             'logged_in_user' => 
             array (
@@ -95,16 +105,16 @@ if($data->num_rows === 1){
         die(json_encode(array(
             'message' => "Incorrect username or password!",
             'status' => "fail",
-            'error_type' => "error"
+            'error_type' => 'generic_request_error',
         )));
     }
 
 }
 else{
     die(json_encode(array(
-        'message' => "Incorrect username or password!",
+        'message' => "The username you entered does not belong to an account.",
         'status' => "fail",
-        'error_type' => "error"
+        'error_type' => 'generic_request_error',
     )));
 }
 }

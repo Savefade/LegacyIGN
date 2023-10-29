@@ -1,7 +1,6 @@
 <?php
 include "configuration.php";
 if($isenabled){
-    $fullarray = array();
     $getdbdata = new mysqli($mysqlurl, $mysqlusername, $mysqlpassword, $mysqldbname);
     $AccountID = $_COOKIE["ds_user_id"];
     $getsession = $getdbdata->prepare('SELECT ID, username, sessionid FROM accounts WHERE ID = ?;');
@@ -13,35 +12,35 @@ if($isenabled){
     }
     $getsessiondata = $getsession->fetch_assoc();
     $sessionid = $getsessiondata['sessionid'];
+    $username = $getsessiondata['username'];
     if($_COOKIE['sessionid'] != $sessionid){
     exit;
     }
-    $id = $_GET['id'];
-   //get id's username
-    $getidusername = $getdbdata->prepare('SELECT username FROM accounts WHERE ID = ?;');
-    $getidusername->bind_param("s", $id);
-    $getidusername->execute();
-    $getidusername = $getidusername->get_result();
-    $getidusername = $getidusername->fetch_assoc();
-    $idusername = $getidusername["username"];
-    //get highest photopostid
-    $getusername = $getdbdata->prepare('SELECT MAX(photouserid) AS max FROM posts WHERE AccountID = ?;');
-        $getusername->bind_param("s", $id);
-        $getusername->execute();
-        $dbresult = $getusername->get_result();
-        if($dbresult->num_rows === 1){
-        $get = $dbresult->fetch_assoc();
-        $biggestuserpostid = $get["max"];
-        }
-    //for
-    for ($repeat = $biggestuserpostid ;$repeat > 0 ; $repeat--) {
-        $postid = $repeat;
-          $query = $getdbdata->prepare('SELECT ID, username, AccountID, PhotoDIR, Likes, Comments, posttimestamp, description, views, isvideo, isuploadedbyprivateacc FROM posts WHERE photouserid = ? AND username = ? LIMIT 1');
-          $query->bind_param("ss", $postid, $idusername);
+$id = $_GET['id'];
+$fullarray = array();
+$getminimumpostidfromuser = $getdbdata->prepare('SELECT MIN(ID) AS minimum FROM `posts` WHERE username = ? Limit 1;');
+$getminimumpostidfromuser->bind_param("s", $username);
+$getminimumpostidfromuser->execute();
+$getminimumpostidfromuser = $getminimumpostidfromuser->get_result();
+$getminimumpostidfromuser = $getminimumpostidfromuser->fetch_assoc();
+$minimumpostid = $getminimumpostidfromuser['minimum'];
+$getmaximumpostidfromuser = $getdbdata->prepare('SELECT MAX(ID) AS maximum FROM `posts` WHERE username = ? Limit 1;');
+$getmaximumpostidfromuser->bind_param("s", $username);
+$getmaximumpostidfromuser->execute();
+$getmaximumpostidfromuser = $getmaximumpostidfromuser->get_result();
+$getmaximumpostidfromuser = $getmaximumpostidfromuser->fetch_assoc();
+$maximumpostid = $getmaximumpostidfromuser['maximum'];
+for ($postID = $minimumpostid; $postID < $maximumpostid; $postID++) {
+        $minimumpostidminus = $minimumpostid - 1;
+        $minimumpostid = $getdbdata->prepare('SELECT MIN(ID) AS minimum FROM `posts` WHERE username = ? AND ID > ? Limit 1;');
+        $minimumpostid->bind_param("s", $minimumpostidminus);
+        
+        $postid = $minimumpostid + 1;
+          $query = $getdbdata->prepare('SELECT ID, username, AccountID, PhotoDIR, Likes, Comments, posttimestamp, description, views, isvideo, isuploadedbyprivateacc FROM posts WHERE ID = ? LIMIT 1');
+          $query->bind_param("s", $postid);
           $query->execute();
           $data = $query->get_result();
           $Islocked = 0;
-
       $row = $data->fetch_assoc();
       $ID = $row['ID'];
       $PhotoDIR = $row['PhotoDIR'];
@@ -54,11 +53,6 @@ if($isenabled){
       $views = $row['views'];
       $isvideo = $row['isvideo'];
       $isuploadedbyprivateacc = $row['isuploadedbyprivateacc'];
-      $pfpURL = "pfps/" . $username . ".png";
-      if(file_exists($pfpURL)){
-        $pfpURL = $baseurl . "/ign/pfps/" . $username . ".png";
-      }
-      else{$pfpURL = $baseurl . "/ign/Icon.png";}
       $itemsarraybro = array(
               'taken_at' => $posttimestamp,
               'pk' => $pk,
@@ -100,7 +94,7 @@ if($isenabled){
                 'username' => $username,
                 'is_verified' => false,
                 'profile_pic_id' => '2577010241112975910_47422889959',
-                'profile_pic_url' => $pfpURL,
+                'profile_pic_url' => 'http://192.168.2.202/ign/Icon.png',
                 'pk_id' => $pk,
                 'full_name' => $username,
                 'is_private' => false,
@@ -161,11 +155,11 @@ if($isenabled){
               'caption' => 
               array (
                 'pk' => $pk,
-                'user_id' => 47422889959,
+                'user_id' => $pk,
                 'text' => $description . " PostID: " . $ID,
                 'type' => 1,
-                'created_at' => 1664003134,
-                'created_at_utc' => 1664003134,
+                'created_at' => time(),
+                'created_at_utc' => time(),
                 'content_type' => 'comment',
                 'status' => 'Active',
                 'bit_flags' => 0,
@@ -176,8 +170,8 @@ if($isenabled){
                   'pk' => $pk,
                   'username' => $username,
                   'is_verified' => false,
-                  'profile_pic_id' => '2577010241112975910_47422889959',
-                  'profile_pic_url' => $pfpURL,
+                  'profile_pic_id' => '1',
+                  'profile_pic_url' => 'http://192.168.2.202/ign/Icon.png',
                   'fbid_v2' => '17841447338787861',
                   'pk_id' => '47422889959',
                   'full_name' => $username,
@@ -203,7 +197,7 @@ if($isenabled){
               ),
               'is_in_profile_grid' => false,
               'profile_grid_control_enabled' => false,
-              'organic_tracking_token' => 'eyJ2ZXJzaW9uIjo1LCJwYXlsb2FkIjp7ImlzX2FuYWx5dGljc190cmFja2VkIjpmYWxzZSwidXVpZCI6ImMzOTQ3ODE5ODljZTRiZTdiZjZmYThmOGQ4YzQ2ZjFiMjkzNDE5MzQwNTIyMjAzNDMwMSJ9LCJzaWduYXR1cmUiOiIifQ==',
+              'organic_tracking_token' => '',
               'has_shared_to_fb' => 0,
               'product_type' => 'feed',
               'deleted_reason' => 0,
@@ -215,17 +209,14 @@ if($isenabled){
               'hide_view_all_comment_entrypoint' => false,
               'inline_composer_display_condition' => 'impression_trigger',
       );
-
+    
               $fullarray[] = $itemsarraybro;
           }
-      }
     $response = array(
         'items' => $fullarray,
         'num_items' => 0,
-        '1' => $idusername,
-        '3' => "1",
-        //'2' => $Accountusername,
         'more_available' => false,
         'status' => "ok"
     );
     die(json_encode($response));
+}

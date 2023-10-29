@@ -3,7 +3,7 @@ include "configuration.php";
 if($isenabled){
 $id = $_GET['id'];
 $getdbdata = new mysqli($mysqlurl, $mysqlusername, $mysqlpassword, $mysqldbname);
-$query = $getdbdata->prepare('SELECT ID, username, uniquetoken, device_id, isaccountprivate, isverified, followercount, followingcount, photocount, pfpURL, fullname FROM accounts WHERE ID = ? LIMIT 1');
+$query = $getdbdata->prepare('SELECT ID, username, uniquetoken, device_id, isaccountprivate, isverified, followercount, followingcount, photocount, pfpURL, fullname, biography, website FROM accounts WHERE ID = ? LIMIT 1');
 $query->bind_param('s', $id);
 $query->execute();
 if($getdbdata->connect_errno){
@@ -15,6 +15,7 @@ if($data->num_rows === 1){
     $fetchstuff = $data->fetch_assoc();
     $ID = $fetchstuff["ID"];
     $username = $fetchstuff["username"];
+    $fullname = $fetchstuff["fullname"];
     $uniquetoken = $fetchstuff["uniquetoken"];
     $device_id = $fetchstuff["device_id"];
     $isverified = $fetchstuff["isverified"];
@@ -22,12 +23,16 @@ if($data->num_rows === 1){
     $followers = $fetchstuff["followercount"];
     $following = $fetchstuff["followingcount"];
     $photocount = $fetchstuff["photocount"];
-    $pfpURL = $fetchstuff["pfpURL"];
+    //$pfpURL = $fetchstuff["pfpURL"];
+    $bio = $fetchstuff["biography"];
+    $website = $fetchstuff["website"];
     $isprivate = false;
-    $verified = true;
-    if($pfpURL == null){
-        $pfpURL = "/ign/icon.png";
-    }
+    $verified = false;
+      $pfpURL = "pfps/" . $username . ".png";
+      if(file_exists($pfpURL)){
+        $pfpURL = $baseurl . "/ign/pfps/" . $username . ".png";
+      }
+      else{$pfpURL = $baseurl . "/ign/Icon.png";}
     if($isverified == 1){
         $verified = true;
     }
@@ -42,8 +47,8 @@ if($data->num_rows === 1){
           'follow_friction_type' => 0,
           'is_verified' => $verified ,
           'profile_pic_id' => '2577010241112975910_47422889959',
-          'profile_pic_url' => $baseurl . $pfpURL,
-          'full_name' => $username,
+          'profile_pic_url' => $pfpURL,
+          'full_name' => $fullname,
           'pk_id' => $ID,
           'is_private' => $isprivate,
           'account_badges' => 
@@ -84,14 +89,14 @@ if($data->num_rows === 1){
           'last_seen_timezone' => '',
           'allow_tag_setting' => 'everyone',
           'allow_mention_setting' => 'everyone',
-          'interop_messaging_user_fbid' => 17846310074577960,
+          'interop_messaging_user_fbid' => 0,
           'bio_links' => 
           array (
           ),
           'can_add_fb_group_link_on_profile' => false,
           'can_follow_hashtag' => false,
           'show_insights_terms' => false,
-          'external_url' => '',
+          'external_url' => $website,
           'can_tag_products_from_merchants' => false,
           'eligible_shopping_signup_entrypoints' => 
           array (
@@ -116,7 +121,7 @@ if($data->num_rows === 1){
           'has_placed_orders' => false,
           'hd_profile_pic_url_info' => 
           array (
-            'url' => $baseurl . $pfpURL,
+            'url' => $pfpURL,
             'width' => 1080,
             'height' => 1080,
           ),
@@ -126,13 +131,13 @@ if($data->num_rows === 1){
             array (
               'width' => 320,
               'height' => 320,
-              'url' => $baseurl . $pfpURL,
+              'url' => $pfpURL,
             ),
             1 => 
             array (
               'width' => 640,
               'height' => 640,
-              'url' => $baseurl . $pfpURL,
+              'url' => $pfpURL,
             ),
           ),
           'is_interest_account' => false,
@@ -154,7 +159,7 @@ if($data->num_rows === 1){
           'is_allowed_to_create_standalone_personal_fundraisers' => false,
           'can_create_new_standalone_fundraiser' => true,
           'can_create_new_standalone_personal_fundraiser' => true,
-          'biography' => 'Bios are not currently supported!',
+          'biography' => $bio,
           'include_direct_blacklist_status' => true,
           'show_fb_link_on_profile' => false,
           'primary_profile_link_type' => 0,

@@ -9,9 +9,30 @@ if ($isenabled) {
             'message' => 'Connection to the database failed! Reason: ' . $getdbdata->connect_error
         );
     } else {
+        $AccountID = $_COOKIE["ds_user_id"];
+        $getsession = $getdbdata->prepare('SELECT ID, username, sessionid FROM accounts WHERE ID = ?;');
+        $getsession->bind_param("s", $AccountID);
+        $getsession->execute();
+        $getsession = $getsession->get_result();
+        $getsessiondata = $getsession->fetch_assoc();
+        $sessionid = $getsessiondata['sessionid'];
+        if($_COOKIE['sessionid'] != $sessionid){
+        unset($_COOKIE['sessionid']);
+        unset($_COOKIE['ds_user_id']);
+        exit;
+        }
         $gethighestpostid = mysqli_query($getdbdata, 'SELECT MAX(ID) AS max FROM `posts`;');
         $fetchstuff = mysqli_fetch_array($gethighestpostid);
         $biggestpostidindb = $fetchstuff['max'];
+        if($biggestpostidindb == 0){
+        die(json_encode(array(
+          'items' => array(),
+          'num_results' => 0,
+          'more_available' => false,
+          'auto_load_more_enabled' => false,
+          'status' => 'ok',
+      )));
+        }
         $fullarray = array();
             $postid = rand(1, $biggestpostidindb);
             $query = $getdbdata->prepare('SELECT ID, username, AccountID, PhotoDIR, Likes, Comments, posttimestamp, description, views, isvideo, isuploadedbyprivateacc FROM posts WHERE ID = ? LIMIT 1');
@@ -32,6 +53,11 @@ if ($isenabled) {
 		$views = $row['views'];
         $isvideo = $row['isvideo'];
 		$isuploadedbyprivateacc = $row['isuploadedbyprivateacc'];
+    $pfpURL = "pfps/" . $username . ".png";
+    if(file_exists($pfpURL)){
+      $pfpURL = $baseurl . "/ign/pfps/" . $username . ".png";
+    }
+    else{$pfpURL = $baseurl . "/ign/Icon.png";}
         $itemsarraybro = array(
                 'taken_at' => $posttimestamp,
                 'pk' => $pk,
@@ -73,7 +99,7 @@ if ($isenabled) {
                   'username' => $username,
                   'is_verified' => false,
                   'profile_pic_id' => '2577010241112975910_47422889959',
-                  'profile_pic_url' => 'http://192.168.2.202/ign/Icon.png',
+                  'profile_pic_url' => $pfpURL,
                   'pk_id' => $pk,
                   'full_name' => $username,
                   'is_private' => false,
@@ -150,7 +176,7 @@ if ($isenabled) {
                     'username' => $username,
                     'is_verified' => false,
                     'profile_pic_id' => '2577010241112975910_47422889959',
-                    'profile_pic_url' => 'http://192.168.2.202/ign/Icon.png',
+                    'profile_pic_url' => $pfpURL,
                     'fbid_v2' => '17841447338787861',
                     'pk_id' => '47422889959',
                     'full_name' => $username,
@@ -200,9 +226,9 @@ if ($isenabled) {
               'pk' => $ID,
               'username' => $username,
               'is_verified' => false,
-              'profile_pic_id' => '2577010241112975910_47422889959',
-              'profile_pic_url' => 'http://192.168.2.202/ign/Icon.png',
-              'pk_id' => '47422889959',
+              'profile_pic_id' => '1',
+              'profile_pic_url' => $pfpURL,
+              'pk_id' => '',
               'full_name' => $username,
               'is_private' => false,
               'profile_grid_display_type' => 'default',

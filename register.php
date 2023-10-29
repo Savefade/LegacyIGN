@@ -2,16 +2,6 @@
 include "configuration.php";
 if($isenabled){
 $signeddatafromthegram = isset($_POST['signed_body']) ? $_POST['signed_body'] : null;
-
-if(isset($_FILES['profile_pic'])){
-    $response = array(
-        'message' => "Currently profile pictures are not supported!",
-        'status' => "fail",
-        'error_type' => "error"
-    );
-    die(json_encode($response));
-}
-else{
 if($signeddatafromthegram != null){
 $sentjson = substr($signeddatafromthegram, 65);
 $decodedjson = json_decode($sentjson, false);
@@ -31,16 +21,22 @@ $deviceID = isset($_POST['device_id']) ? $_POST['device_id'] : null;
 }
 //add 1 account per device check
 $getdbdata = new mysqli($mysqlurl, $mysqlusername, $mysqlpassword, $mysqldbname);
-$query = $getdbdata->prepare('SELECT ID, username, Password, uniquetoken, device_id, isaccountprivate, isverified FROM accounts WHERE username = ? LIMIT 1');
+$query = $getdbdata->prepare('SELECT ID, username, Password, uniquetoken, device_id, sessionid, isaccountprivate, isverified FROM accounts WHERE username = ? LIMIT 1');
 $query->bind_param('s', $username);
 $query->execute();
 $data = $query->get_result();
 $query->close();
 if($data->num_rows === 1){
-    $response = array(
-        'message' => "This username is already taken!",
-        'status' => "fail",
-        'error_type' => "error"
+    $response = array (
+        'errors' => 
+        array (
+          'error' => 
+          array (
+            0 => 'This username is already taken!',
+          ),
+        ),
+        'status' => 'ok',
+        'error_type' => 'generic_request_error',
     );
     die(json_encode($response));
 }
@@ -52,18 +48,30 @@ else{
     $biggestuseridindb = $fetchstuff['max']; //replace with mario's suggestion
     $ID = $biggestuseridindb + 1;
     $pfpURL = "/ign/icon.png";
+    $sessionid = "default";
     $hashedpassword = password_hash($token . $password . $token, PASSWORD_BCRYPT);
-    $makeaccount = $getdbdata->prepare('INSERT INTO accounts (ID, username, Password, uniquetoken, device_id, isaccountprivate, isverified, followercount, followingcount, photocount, pfpURL, fullname) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)');
-    $makeaccount->bind_param('ssssssssssss', $ID, $username, $hashedpassword, $token, $deviceID, $isprivate, $defaultverificationstatus, $defaultfollowercount, $defaultfollowingcount, $defaultphotocount, $pfpURL, $fullname);
+    $makeaccount = $getdbdata->prepare('INSERT INTO accounts (ID, username, Password, uniquetoken, device_id, sessionid, isaccountprivate, isverified, followercount, followingcount, photocount, pfpURL, fullname, biography, website) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, "", "")'); //15
+    $makeaccount->bind_param('sssssssssssss', $ID, $username, $hashedpassword, $token, $deviceID, $sessionid, $isprivate, $defaultverificationstatus, $defaultfollowercount, $defaultfollowingcount, $defaultphotocount, $pfpURL, $fullname); //13
     $makeaccount->execute();
     $makeaccount->close();
     $gethighestuserid->close();
-    $response = array(
-        'message' => "Your account has been created successfully! Just login and have fun!",
-        'status' => "fail",
-        'error_type' => "error"
+    if(isset($_FILES['profile_pic'])){
+      $uploadedphoto = $_FILES["profile_pic"]["tmp_name"];
+      $nameofdafile = "pfps/" . $username . ".png";
+      if(move_uploaded_file($uploadedphoto, $nameofdafile)){
+      }else{die(json_encode(array('status' => 'fail',)));}
+    }
+    $response = array (
+        'errors' => 
+        array (
+          'error' => 
+          array (
+            0 => 'Your account has been created successfully! Just login and have fun!',
+          ),
+        ),
+        'status' => 'ok',
+        'error_type' => 'generic_request_error',
     );
     die(json_encode($response));
-}
 }
 }
