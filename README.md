@@ -10,4 +10,4 @@ TBC
 
 # Credits
 I.instagram.com - API Responses <br />
-MarioParty1 - Suggestions
+Mariopizza1 - Suggestions
