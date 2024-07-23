@@ -40,7 +40,7 @@ $is_private = 0;
 $username = $decodedjson->username;
 if(isset($_FILES['profile_pic'])){
 $uploadedphoto = basename($_FILES["profile_pic"]["tmp_name"]);
-$nameofdafile = "pfps/" . $username . ".png";
+$nameofdafile = "pfps/" . basename($username) . ".png";
 if(move_uploaded_file($uploadedphoto, $nameofdafile)){
 die(json_encode(array('status' => 'ok',)));
 }else{die(json_encode(array('status' => 'fail',)));}
