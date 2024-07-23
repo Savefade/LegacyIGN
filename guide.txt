@@ -1,0 +1,21 @@
+You need Fiddler Classic (Charles also works), a PHP 7/8 server (Preferably use XAMPP or XampServer) and a MySQL database <br />
+
+1. Extract the files in this github repo (including the folders).
+2. Create a DB with the name LegacyIGN then import the .sql database file in your database.
+3. Open your proxy and setup your proxy.
+3.5 - For Fiddler
+- Enable these options in Tools->Options->HTTPS: Decrypt HTTPS Traffic (Install the certificate fom the prompt), Ignore server certificate errors (Gets rid of annoying errors)
+- Enable these options in Tools->Options->Connections: Allow remote computers to connect
+- Restart fiddler
+- Add the contents of the URLs.txt file in Tools->HOSTS
+4. Connect the proxy to your device.
+- Install the Fiddler root certificate from http://ipv4.fiddler:8888 (if you changed the default proxy port change 8888 to your new port)
+5. Use a proxy to redirect the traffic to your selfhosted server.
+6. Open the instagram app and make an account.
+7. Profit
+
+
+
+Useful tutorials:
+Importing a DB file in phpMyAdmin: https://www.youtube.com/watch?v=xZ5CLZBBg8c
+
