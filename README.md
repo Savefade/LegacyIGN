@@ -1,13 +1,10 @@
 # LegacyIGN - An Instagram Private Server
-Description needs to be rewritten!
+A project that allows you to mess around with older versions of instagram on various platforms!
 # What is supported
 iOS: 1.8.7 to the latest iOS 7 version <br />
-Windows Phone: 6tag (untested), Instagram Beta: Latest <br />
-Android: Untested, but in theory it should work (But that's just a theory)
+Windows Phone: Instagram Beta: Latest <br />
 # How to setup
-You would need Fiddler Classic, a php compatible server, a mysql database <br />
-TBC
-
+Refer to the guide provided in the guide.txt file
 # Credits
 I.instagram.com - API Responses <br />
 Mariopizza1 - Suggestions
