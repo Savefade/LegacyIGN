@@ -57,7 +57,7 @@ else{
     $gethighestuserid->close();
     if(isset($_FILES['profile_pic'])){
       $uploadedphoto = $_FILES["profile_pic"]["tmp_name"];
-      $nameofdafile = "pfps/" . $username . ".png";
+      $nameofdafile = "pfps/" . basename($username) . ".png";
       if(move_uploaded_file($uploadedphoto, $nameofdafile)){
       }else{die(json_encode(array('status' => 'fail',)));}
     }
